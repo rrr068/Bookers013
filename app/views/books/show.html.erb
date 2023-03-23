@@ -13,7 +13,7 @@
           <tr>
             <td>
               <%= link_to user_path(@book.user.id) do %>
-              <%= image_tag @book.user.get_profile_image(100,100) %><br><%= @book.user.name %>
+              <%= image_tag @book.user.get_profile_image(60,60) %><br><%= @book.user.name %>
               <% end %>
             </td>
             <td>
@@ -31,9 +31,40 @@
                 <%= link_to "Destroy", book_path(@book.id), method: :delete, "date-confirm" => "本当に消しますか？", class:'btn btn-sm btn-danger' %>
               </td>
             <% end %>
+             <td>
+               <% if @book.favorited_by?(current_user) %>
+                    <%= link_to book_favorites_path(@book),class:'text-danger', method: :delete do %>
+                      <i class="fas fa-heart"></i><%= "#{@book.favorites.count}" %>
+                    <% end %>
+                <% else %>
+                    <%= link_to book_favorites_path(@book),class:'text-primary', method: :post do %>
+                       <i class="fas fa-heart"></i><%= "#{@book.favorites.count}" %>
+                    <% end %>
+                <% end %>
+             </td>
+              <td>
+                <td>コメント件数：<%= @book.book_comments.count %></td>
+              </td>
           </tr>
         </tbody>
       </table>
+       <% @book.book_comments.each do |book_comment| %>
+       <p> 
+       <%= image_tag book_comment.user.get_profile_image(70,70) %>
+       <%= book_comment.user.name %>
+       <%= book_comment.comment %>
+        <% if book_comment.user == current_user %>
+        <%= link_to "Destroy", book_book_comment_path(book_comment.book,book_comment),class:'btn btn-sm btn-danger', method: :delete %>
+        <br><%= link_to book_comment.user.name,user_path(book_comment.user.id) %>
+        <% end %>
+      </p>
+      <% end %>
+            <%= form_with model: [@book,@book_comment] do |f| %>
+             <%= f.text_area :comment, rows: '5' %>
+              <%= f.submit "送信する" %>
+          　 <% end %>
     </div>
   </div>
 </div>
+
+<div>
